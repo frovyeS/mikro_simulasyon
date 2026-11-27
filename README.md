@@ -5,7 +5,7 @@ Bu klasör, **terminal veya Node.js gerektirmeyen** hazır web sitesi sürümüd
 ## GitHub üzerinden yayınlama (terminal kullanmadan)
 
 1. Bu ZIP dosyasını bilgisayarında bir klasöre çıkart. ZIP dosyasını GitHub'a ZIP olarak yükleme; içindeki dosyaları yükle.
-2. GitHub'da yeni bir repository (depo) oluştur. Depo adı örneğin `mikro-simulasyon` olabilir.
+2. GitHub'da yeni bir repository (depo) oluştur. Depo adı örneğin `mikro-simulasyon` olabilir.....
 3. Deponun ana sayfasında **Add file → Upload files** seçeneğine gir.
 4. ZIP'ten çıkardığın klasörün **içindeki** `index.html`, `app.js`, `style.css` ve `README.md` dosyalarını sürükleyip bırak. `index.html` depo ana dizininde görünmeli; dosyaları bir alt klasörün içine koyma.
 5. **Commit changes** ile dosyaları kaydet.
