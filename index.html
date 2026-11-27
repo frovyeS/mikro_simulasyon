@@ -1,1 +1,121 @@
-<!doctype html><html lang="tr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#10151d"/><title>Mikro Simülasyon</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101722">
+  <meta name="description" content="Newton mekaniğini keşfetmek için etkileşimli iki boyutlu mikro simülasyon laboratuvarı.">
+  <title>Mikro Simülasyon — Etkileşimli Laboratuvar</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="app dark" id="app">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Mikro Simülasyon ana sayfa">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span><strong>Mikro Simülasyon</strong><small>Bilimsel çalışma alanı</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Ana menü">
+        <a class="active" href="#explore">Keşfet</a>
+        <a href="#analysis">Analiz</a>
+        <a href="#experiments">Deneylerim</a>
+        <a href="#learn">Öğren</a>
+      </nav>
+      <button class="icon-button" id="themeToggle" type="button" aria-label="Açık ve koyu tema arasında geçiş yap" title="Temayı değiştir">☼</button>
+    </header>
+
+    <main id="top">
+      <section class="welcome" id="explore">
+        <div>
+          <div class="eyebrow">ETKİLEŞİMLİ LABORATUVAR <span class="eyebrow-line"></span></div>
+          <h1>Newton mekaniği</h1>
+          <p>Parametreleri değiştir, hareketi gözlemle ve kendi deneylerini oluştur.</p>
+        </div>
+        <div class="status-block">
+          <span class="status-pill" id="statusPill"><i></i> Duraklatıldı</span>
+          <span class="status-caption">MODEL <b>N-body gravity</b></span>
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Simülasyon çalışma alanı">
+        <aside class="panel controls-panel">
+          <div class="panel-heading"><span class="heading-icon">⌘</span><h2>Parametreler</h2></div>
+          <label class="field-label" for="presetSelect">Hazır deney</label>
+          <select id="presetSelect" class="select-control">
+            <option value="Orbit">Kararlı yörünge</option>
+            <option value="Three body">Üç cisim problemi</option>
+            <option value="Free fall">Serbest hareket</option>
+          </select>
+
+          <div class="range-group">
+            <label for="gravityRange">Çekim katsayısı <output id="gravityValue">0.80</output></label>
+            <input id="gravityRange" type="range" min="0" max="2" step="0.01" value="0.8">
+            <div class="range-ends"><span>0.00</span><span>2.00</span></div>
+          </div>
+          <div class="range-group">
+            <label for="stepRange">Zaman adımı <output id="stepValue">0.016</output></label>
+            <input id="stepRange" type="range" min="0.002" max="0.04" step="0.001" value="0.016">
+            <div class="range-ends"><span>0.002</span><span>0.040</span></div>
+          </div>
+          <div class="range-group">
+            <label for="speedRange">Simülasyon hızı <output id="speedValue">1.0×</output></label>
+            <input id="speedRange" type="range" min="0.2" max="4" step="0.1" value="1">
+            <div class="range-ends"><span>0.2×</span><span>4.0×</span></div>
+          </div>
+
+          <div class="toggle-row"><span>Hareket izleri</span><label class="switch"><input id="trailsToggle" type="checkbox" checked><span></span></label></div>
+          <div class="toggle-row"><span>Izgara</span><label class="switch"><input id="gridToggle" type="checkbox" checked><span></span></label></div>
+
+          <div class="section-divider"></div>
+          <div class="subheading"><h3>Cisimler</h3><button class="small-button" id="addBody" type="button"><b>＋</b> Ekle</button></div>
+          <div id="bodyList" class="body-list" aria-live="polite"></div>
+          <div class="info-note"><span>ⓘ</span><p>Basitleştirilmiş Newton çekim modeli. Sonuçlar eğitim ve keşif amaçlıdır.</p></div>
+        </aside>
+
+        <section class="scene-panel" aria-label="Simülasyon sahnesi">
+          <div class="scene-header">
+            <div><h2>Simülasyon sahnesi</h2><p>2D · Parçacık modeli</p></div>
+            <button class="small-button view-reset" id="viewReset" type="button">↗ Görünümü sıfırla</button>
+          </div>
+          <div class="canvas-wrap"><canvas id="simulationCanvas" class="scene" aria-label="Cisimlerin hareketini gösteren simülasyon alanı"></canvas><div class="canvas-tip">Sürükle: taşı <span>·</span> Tekerlek: yakınlaştır</div></div>
+          <div class="transport-panel">
+            <div class="transport-actions">
+              <button class="button-primary" id="playButton" type="button"><span id="playIcon">▶</span><span id="playText">Başlat</span></button>
+              <button class="button-secondary square-button" id="stepButton" type="button" title="Tek adım ilerlet" aria-label="Tek adım ilerlet">▶│</button>
+              <button class="button-secondary square-button" id="resetButton" type="button" title="Deneyi sıfırla" aria-label="Deneyi sıfırla">↺</button>
+              <span class="simulation-clock">t = <b id="timeValue">0.00</b> s</span>
+            </div>
+            <div class="timeline-track"><span id="timelineFill"></span></div>
+          </div>
+        </section>
+
+        <aside class="panel analysis-panel" id="analysis">
+          <div class="panel-heading"><span class="heading-icon">⌁</span><h2>Analiz</h2></div>
+          <div class="metric-card"><span>Simülasyon zamanı</span><strong><b id="metricTime">0.00</b> <small>s</small></strong></div>
+          <div class="metric-card"><span>Cisim sayısı</span><strong id="metricBodies">2</strong></div>
+          <div class="metric-card"><span>Kinetik enerji (proxy)</span><strong id="metricEnergy">73.50</strong></div>
+          <div class="metric-card"><span>Momentum büyüklükleri toplamı</span><strong id="metricMomentum">42.00</strong></div>
+          <div class="mini-chart"><h3>Hız büyüklükleri</h3><div id="velocityBars"></div></div>
+          <div class="mini-chart"><h3>Merkeze uzaklık</h3><div id="positionBars"></div></div>
+          <button class="action-button" id="saveButton" type="button">▣ <span>Deneyi kaydet</span></button>
+          <div class="file-actions">
+            <button class="action-button secondary-action" id="exportButton" type="button">↓ <span>JSON dışa aktar</span></button>
+            <label class="action-button secondary-action file-label">↑ <span>JSON içe aktar</span><input id="importInput" type="file" accept="application/json,.json"></label>
+          </div>
+          <div class="saved-section" id="experiments">
+            <div class="saved-heading"><h3>Kaydedilen deneyler</h3><span id="savedCount">0</span></div>
+            <div id="savedList" class="saved-list"><p class="empty-state">Henüz kaydedilmiş deney yok.</p></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="learn-strip" id="learn">
+        <div class="learn-icon">✦</div>
+        <div><strong>Nasıl kullanılır?</strong><p>Bir hazır deney seç, çekim katsayısını değiştir ve Başlat'a bas. Sahneyi sürükleyerek taşıyabilir, fare tekerleğiyle yakınlaştırabilirsin.</p></div>
+      </section>
+      <footer><span>Mikro Simülasyon <b>·</b> Etkileşimli laboratuvar</span><span>Model ve sayısal sonuçlar eğitim amaçlıdır.</span></footer>
+    </main>
+  </div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
